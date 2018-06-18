@@ -5,16 +5,26 @@ VisualStudioVersion = 15.0.27703.2026
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetDisc", "NetDisc\NetDisc.csproj", "{54EBDEAE-AC7D-46F1-B65C-B5D1A2B7EA06}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetStatTester", "NetStatTester\NetStatTester.csproj", "{E3E92F5E-75CB-4476-868E-D28B83AC4D1A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+		SimpleRun|Any CPU = SimpleRun|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{54EBDEAE-AC7D-46F1-B65C-B5D1A2B7EA06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{54EBDEAE-AC7D-46F1-B65C-B5D1A2B7EA06}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{54EBDEAE-AC7D-46F1-B65C-B5D1A2B7EA06}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{54EBDEAE-AC7D-46F1-B65C-B5D1A2B7EA06}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54EBDEAE-AC7D-46F1-B65C-B5D1A2B7EA06}.SimpleRun|Any CPU.ActiveCfg = SimpleRun|Any CPU
+		{E3E92F5E-75CB-4476-868E-D28B83AC4D1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3E92F5E-75CB-4476-868E-D28B83AC4D1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3E92F5E-75CB-4476-868E-D28B83AC4D1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3E92F5E-75CB-4476-868E-D28B83AC4D1A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E3E92F5E-75CB-4476-868E-D28B83AC4D1A}.SimpleRun|Any CPU.ActiveCfg = Release|Any CPU
+		{E3E92F5E-75CB-4476-868E-D28B83AC4D1A}.SimpleRun|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
