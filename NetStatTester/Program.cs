@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
@@ -11,28 +12,77 @@ namespace NetStatTester
 {
     class Program
     {
+
+        private delegate void pingDelegate();
+
         static void Main(string[] args)
         {
             //Test();
             //GetInterface();
             //PingTest();
             //PingTestAsync();
-            ThreadTest();
+            //ThreadTest();
+            //IPAddress iptest = GetSubnetMask(IPAddress.Parse("192.168.1.107"));
+            //Console.WriteLine(iptest);
+            //Console.WriteLine(iptest);
+            for(int i=0;i<108;i++)
+            {
+                ThreadTest(i);
+
+            }
+
+            Console.WriteLine("END OF PROGRAM");
+            Console.ReadLine();
         }
 
-        public static void ThreadTest()
+        public static void ThreadTest(int ip)
+        {
+            Task<PingReply> ping = Task.Run(() =>
+            {
+                return (new Program().PingTask(ip));
+            });
+
+            ping.ContinueWith(res =>
+            {
+                //Console.WriteLine("at Task result callback");
+                Console.WriteLine(ping.Result.Address);
+                
+            });
+
+        }
+
+        public PingReply PingTask(int index)
         {
 
-            Console.WriteLine("Main thread: Start a second thread.");
-            Thread t = new Thread(new ThreadStart(PingTest));
-            t.Start();
-            Thread.Sleep(0);
-            Console.WriteLine("Main Thread doing stuff...");
-            Console.WriteLine("Main thread: Call Join(), to wait until ThreadProc ends.");
-            t.Join();
-            Console.WriteLine("Main thread: ThreadProc.Join has returned.  Press Enter to end program.");
-            Console.ReadLine();
+            Ping ping = new Ping();
+            PingOptions options = new PingOptions
+            {
+                Ttl = 30,
+                DontFragment = true
+            };
+            int timeout = 1000;
+            string address = "192.168.1."+index;
 
+            string data = "one ping Vasilyi!";
+            byte[] buffer = Encoding.ASCII.GetBytes(data);
+
+            PingReply reply = ping.Send(address, timeout, buffer, options);
+            try
+            {
+                if (reply.Status == IPStatus.Success)
+                {
+                    Console.WriteLine("Ping success");
+                    return reply;
+                } else
+                {
+                    //Console.WriteLine("Ping failed");
+                    return reply;
+                }
+            } catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return null;
+            }
         }
 
         public static void PingTestAsync()
@@ -80,8 +130,8 @@ namespace NetStatTester
             PingOptions options = new PingOptions();
             options.Ttl = 30;
             options.DontFragment = true;
-            int timeout = 10000;
-            string address = "www.google.com";
+            int timeout = 1000;
+            string address = "localhost";
 
             string data = "one ping Vasilyi!";
             byte[] buffer = Encoding.ASCII.GetBytes(data);
@@ -94,9 +144,9 @@ namespace NetStatTester
             {
                 Console.WriteLine("Address: {0}", reply.Address.ToString());
                 Console.WriteLine("RoundTrip time: {0}", reply.RoundtripTime);
-                Console.WriteLine("Time to live: {0}", reply.Options.Ttl);
-                Console.WriteLine("Don't fragment: {0}", reply.Options.DontFragment);
-                Console.WriteLine("Buffer size: {0}", reply.Buffer.Length);
+                //Console.WriteLine("Time to live: {0}", reply.Options.Ttl);
+                //Console.WriteLine("Don't fragment: {0}", reply.Options.DontFragment);
+                //Console.WriteLine("Buffer size: {0}", reply.Buffer.Length);
             } else
                 {
                     Console.WriteLine("Ping failed " + reply.Status);
@@ -120,24 +170,31 @@ namespace NetStatTester
                     if(adapter.OperationalStatus == OperationalStatus.Up)
                     {
                         properties = adapter.GetIPProperties();
-                        Console.WriteLine("selected " + adapter.Name);
-                        Console.WriteLine("Desciprtion: " + adapter.Description);
-                        Console.WriteLine("IPv4 " + ShowIPv4Addresses(adapter.NetworkInterfaceType));
-                        Console.WriteLine("MAC " + adapter.GetPhysicalAddress().ToString());
-                        Console.WriteLine("IPv6 " + ShowIPv6Addresses(adapter.NetworkInterfaceType));
+                        //Console.WriteLine("selected " + adapter.Name);
+                        //Console.WriteLine("Desciprtion: " + adapter.Description);
+                        //Console.WriteLine("IPv4 " + ShowIPv4Addresses(adapter.NetworkInterfaceType));
+                        //Console.WriteLine("MAC " + adapter.GetPhysicalAddress().ToString());
+                        //Console.WriteLine("IPv6 " + ShowIPv6Addresses(adapter.NetworkInterfaceType));
+                        //                        adapter.GetIPProperties().UnicastAddresses.Select(g => g?.IPv4Mask).Where(a => {
+                        //                            Console.WriteLine(g);
+                        //.                           return a != null && !a.Equals("0.0.0.0"); }
+                        //                        ).FirstOrDefault().ToString();
+                        //Console.WriteLine(adapter.GetIPProperties().UnicastAddresses.SelectMany().ToString());
+                        //adapter.GetIPProperties().UnicastAddresses.ToString();
+                        //Console.WriteLine(GetSubnetMask(GetAllLocalIPv4AsIPAdress(adapter.NetworkInterfaceType));
                     }
                 }
 
             }
         }
 
-        private static string ShowIPv4Addresses(NetworkInterfaceType networkIftype)
-        {
+        //private static IPAddress ShowIPv4AddressesAsAddress(NetworkInterfaceType networkIftype)
+        //{
 
-            string[] ip4arr = GetAllLocalIPv4(networkIftype);
+        //    IPAddress ip4arr = GetAllLocalIPv4AsIPAddress(networkIftype).ToArray();
 
-            return ip4arr.FirstOrDefault<string>();
-        }
+        //    return ip4arr.FirstOrDefault<string>();
+        //}
 
         private static string ShowIPv6Addresses(NetworkInterfaceType networkIftype)
         {
@@ -164,6 +221,24 @@ namespace NetStatTester
                 }
             }
             return ipAddrList.ToArray();
+        }
+        public static List<IPAddress> GetAllLocalIPv4AsIPAddress(NetworkInterfaceType _type)
+        {
+            List<IPAddress> ipAddrList = new List<IPAddress>();
+            foreach (NetworkInterface item in NetworkInterface.GetAllNetworkInterfaces())
+            {
+                if (item.NetworkInterfaceType == _type && item.OperationalStatus == OperationalStatus.Up)
+                {
+                    foreach (UnicastIPAddressInformation ip in item.GetIPProperties().UnicastAddresses)
+                    {
+                        if (ip.Address.AddressFamily == AddressFamily.InterNetwork)
+                        {
+                            ipAddrList.Add(ip.Address);
+                        }
+                    }
+                }
+            }
+            return ipAddrList;
         }
 
         public static string[] GetAllLocalIPv6(NetworkInterfaceType _type)
@@ -222,5 +297,25 @@ namespace NetStatTester
             Console.WriteLine();
         }
 
+        public static IPAddress GetSubnetMask(IPAddress address)
+        {
+            foreach (NetworkInterface adapter in NetworkInterface.GetAllNetworkInterfaces())
+            {
+                foreach (UnicastIPAddressInformation unicastIPAddressInformation in adapter.GetIPProperties().UnicastAddresses)
+                {
+                    if (unicastIPAddressInformation.Address.AddressFamily == AddressFamily.InterNetwork)
+                    {
+                        if (address.Equals(unicastIPAddressInformation.Address))
+                        {
+                            return unicastIPAddressInformation.IPv4Mask;
+                        }
+                    }
+                }
+            }
+            throw new ArgumentException(string.Format("Can't find subnetmask for IP address '{0}'", address));
+        }
+
     }
+
 }
+

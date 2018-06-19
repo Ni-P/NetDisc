@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
@@ -26,8 +27,6 @@ namespace NetDisc
             return reply;
         }
 
-        
-  
 
         public NetworkInterface GetInterface()
         {
@@ -40,8 +39,8 @@ namespace NetDisc
                     if (adapter.OperationalStatus == OperationalStatus.Up)
                     {
                         properties = adapter.GetIPProperties();
-                        Console.WriteLine("selected " + adapter.Name);
-                        Console.WriteLine("Desciprtion: " + adapter.Description);
+                        Console.WriteLine("Selected " + adapter.Name);
+                        Console.WriteLine("Description: " + adapter.Description);
                         Console.WriteLine("IP4 " + ShowIPAddresses(adapter.NetworkInterfaceType));
                         return adapter;
                     }
@@ -51,40 +50,41 @@ namespace NetDisc
             return null;
         }
 
-        public string getIPv4Address(NetworkInterface networkInterface)
+        public IPAddress getIPv4Address(NetworkInterface networkInterface)
         {
             return ShowIPAddresses(networkInterface.NetworkInterfaceType);
         }
 
-        public string getIPv6Address(NetworkInterface networkInterface)
+        public IPAddress getIPv6Address(NetworkInterface networkInterface)
         {
             return getIpv6Address(networkInterface.NetworkInterfaceType);
         }
 
-        private string getIpv6Address(NetworkInterfaceType networkIftype)
+        private IPAddress getIpv6Address(NetworkInterfaceType networkIftype)
         {
 
-            string[] ip6arr = GetAllLocalIPv6(networkIftype);
+            IPAddress[] ip6arr = GetAllLocalIPv6(networkIftype);
 
-            return ip6arr.FirstOrDefault<string>();
+            return ip6arr.FirstOrDefault<IPAddress>();
         }
 
         public string getMAC(NetworkInterface networkInterface)
         {
+            
             return networkInterface.GetPhysicalAddress().ToString();
         }
 
-        private string ShowIPAddresses(NetworkInterfaceType networkIftype)
+        private IPAddress ShowIPAddresses(NetworkInterfaceType networkIftype)
         {
 
-            string[] ip4arr = GetAllLocalIPv4(networkIftype);
+            IPAddress[] ip4arr = GetLocalIpStringArr(networkIftype);
 
-            return ip4arr.FirstOrDefault<string>();
+            return ip4arr.FirstOrDefault<IPAddress>();
         }
 
-        private string[] GetAllLocalIPv4(NetworkInterfaceType _type)
+        private IPAddress[] GetLocalIpStringArr(NetworkInterfaceType _type)
         {
-            List<string> ipAddrList = new List<string>();
+            List<IPAddress> ipAddrList = new List<IPAddress>();
             foreach (NetworkInterface item in NetworkInterface.GetAllNetworkInterfaces())
             {
                 if (item.NetworkInterfaceType == _type && item.OperationalStatus == OperationalStatus.Up)
@@ -93,7 +93,25 @@ namespace NetDisc
                     {
                         if (ip.Address.AddressFamily == AddressFamily.InterNetwork)
                         {
-                            ipAddrList.Add(ip.Address.ToString());
+                            ipAddrList.Add(ip.Address);
+                        }
+                    }
+                }
+            }
+            return ipAddrList.ToArray();
+        }
+        private IPAddress[] GetLocalIpArray(NetworkInterfaceType _type)
+        {
+            List<IPAddress> ipAddrList = new List<IPAddress>();
+            foreach (NetworkInterface item in NetworkInterface.GetAllNetworkInterfaces())
+            {
+                if (item.NetworkInterfaceType == _type && item.OperationalStatus == OperationalStatus.Up)
+                {
+                    foreach (UnicastIPAddressInformation ip in item.GetIPProperties().UnicastAddresses)
+                    {
+                        if (ip.Address.AddressFamily == AddressFamily.InterNetwork)
+                        {
+                            ipAddrList.Add(ip.Address);
                         }
                     }
                 }
@@ -101,10 +119,9 @@ namespace NetDisc
             return ipAddrList.ToArray();
         }
 
-
-        private string[] GetAllLocalIPv6(NetworkInterfaceType _type)
+        private IPAddress[] GetAllLocalIPv6(NetworkInterfaceType _type)
         {
-            List<string> ipAddrList = new List<string>();
+            List<IPAddress> ipAddrList = new List<IPAddress>();
             foreach (NetworkInterface item in NetworkInterface.GetAllNetworkInterfaces())
             {
                 if (item.NetworkInterfaceType == _type && item.OperationalStatus == OperationalStatus.Up)
@@ -113,7 +130,7 @@ namespace NetDisc
                     {
                         if (ip.Address.AddressFamily == AddressFamily.InterNetworkV6)
                         {
-                            ipAddrList.Add(ip.Address.ToString());
+                            ipAddrList.Add(ip.Address);
                         }
                     }
                 }

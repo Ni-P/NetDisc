@@ -1,6 +1,6 @@
 ﻿namespace NetDisc
 {
-    partial class Form1
+    partial class MainForm
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.listBox1 = new System.Windows.Forms.ListBox();
+            this.ListBoxResults = new System.Windows.Forms.ListBox();
             this.buttonSearch = new System.Windows.Forms.Button();
             this.buttonPing = new System.Windows.Forms.Button();
             this.labelIP4 = new System.Windows.Forms.Label();
@@ -47,21 +47,26 @@
             this.textBoxTargetSubnet = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.textBoxSubnetIdentifier = new System.Windows.Forms.TextBox();
+            this.textBoxTargetSubnetIdentifier = new System.Windows.Forms.TextBox();
+            this.textBoxRangeMin = new System.Windows.Forms.TextBox();
+            this.textBoxRangeMax = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
-            // listBox1
+            // ListBoxResults
             // 
-            this.listBox1.FormattingEnabled = true;
-            this.listBox1.Location = new System.Drawing.Point(12, 12);
-            this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(364, 329);
-            this.listBox1.TabIndex = 0;
+            this.ListBoxResults.FormattingEnabled = true;
+            this.ListBoxResults.Location = new System.Drawing.Point(12, 12);
+            this.ListBoxResults.Name = "ListBoxResults";
+            this.ListBoxResults.Size = new System.Drawing.Size(364, 329);
+            this.ListBoxResults.TabIndex = 0;
             // 
             // buttonSearch
             // 
-            this.buttonSearch.Location = new System.Drawing.Point(264, 345);
+            this.buttonSearch.Location = new System.Drawing.Point(647, 159);
             this.buttonSearch.Name = "buttonSearch";
-            this.buttonSearch.Size = new System.Drawing.Size(112, 23);
+            this.buttonSearch.Size = new System.Drawing.Size(141, 23);
             this.buttonSearch.TabIndex = 1;
             this.buttonSearch.Text = "Search";
             this.buttonSearch.UseVisualStyleBackColor = true;
@@ -69,9 +74,9 @@
             // 
             // buttonPing
             // 
-            this.buttonPing.Location = new System.Drawing.Point(614, 130);
+            this.buttonPing.Location = new System.Drawing.Point(647, 130);
             this.buttonPing.Name = "buttonPing";
-            this.buttonPing.Size = new System.Drawing.Size(174, 23);
+            this.buttonPing.Size = new System.Drawing.Size(141, 23);
             this.buttonPing.TabIndex = 2;
             this.buttonPing.Text = "Ping";
             this.buttonPing.UseVisualStyleBackColor = true;
@@ -101,6 +106,7 @@
             this.richTextBoxIP4.Multiline = false;
             this.richTextBoxIP4.Name = "richTextBoxIP4";
             this.richTextBoxIP4.ReadOnly = true;
+            this.richTextBoxIP4.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
             this.richTextBoxIP4.Size = new System.Drawing.Size(136, 20);
             this.richTextBoxIP4.TabIndex = 5;
             this.richTextBoxIP4.Text = "Tbox 1 test text";
@@ -109,6 +115,7 @@
             // 
             this.richTextBoxIP6.Location = new System.Drawing.Point(469, 37);
             this.richTextBoxIP6.Name = "richTextBoxIP6";
+            this.richTextBoxIP6.ReadOnly = true;
             this.richTextBoxIP6.Size = new System.Drawing.Size(319, 20);
             this.richTextBoxIP6.TabIndex = 6;
             this.richTextBoxIP6.Text = "Tbox 2 test text";
@@ -119,6 +126,7 @@
             this.richTextBoxMAC.Multiline = false;
             this.richTextBoxMAC.Name = "richTextBoxMAC";
             this.richTextBoxMAC.ReadOnly = true;
+            this.richTextBoxMAC.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
             this.richTextBoxMAC.Size = new System.Drawing.Size(141, 20);
             this.richTextBoxMAC.TabIndex = 8;
             this.richTextBoxMAC.Text = "Tbox 1 test text";
@@ -136,7 +144,8 @@
             // 
             this.richTextBoxSubnet.Location = new System.Drawing.Point(469, 63);
             this.richTextBoxSubnet.Name = "richTextBoxSubnet";
-            this.richTextBoxSubnet.Size = new System.Drawing.Size(136, 20);
+            this.richTextBoxSubnet.ReadOnly = true;
+            this.richTextBoxSubnet.Size = new System.Drawing.Size(278, 20);
             this.richTextBoxSubnet.TabIndex = 10;
             this.richTextBoxSubnet.Text = "Tbox 2 test text";
             // 
@@ -153,9 +162,11 @@
             // 
             this.richTextBoxGateway.Location = new System.Drawing.Point(469, 89);
             this.richTextBoxGateway.Name = "richTextBoxGateway";
-            this.richTextBoxGateway.Size = new System.Drawing.Size(136, 20);
+            this.richTextBoxGateway.ReadOnly = true;
+            this.richTextBoxGateway.Size = new System.Drawing.Size(319, 20);
             this.richTextBoxGateway.TabIndex = 12;
             this.richTextBoxGateway.Text = "Tbox 2 test text";
+            this.richTextBoxGateway.TextChanged += new System.EventHandler(this.richTextBoxGateway_TextChanged);
             // 
             // labelGateway
             // 
@@ -179,9 +190,10 @@
             // 
             this.textBoxTarget.Location = new System.Drawing.Point(469, 132);
             this.textBoxTarget.Name = "textBoxTarget";
-            this.textBoxTarget.Size = new System.Drawing.Size(136, 20);
+            this.textBoxTarget.Size = new System.Drawing.Size(143, 20);
             this.textBoxTarget.TabIndex = 14;
             this.textBoxTarget.Text = "localhost";
+            this.textBoxTarget.TextChanged += new System.EventHandler(this.textBoxTarget_TextChanged);
             // 
             // backgroundPinger
             // 
@@ -190,17 +202,16 @@
             // 
             // textBoxTargetSubnet
             // 
-            this.textBoxTargetSubnet.Location = new System.Drawing.Point(90, 345);
+            this.textBoxTargetSubnet.Location = new System.Drawing.Point(469, 160);
             this.textBoxTargetSubnet.Name = "textBoxTargetSubnet";
-            this.textBoxTargetSubnet.Size = new System.Drawing.Size(139, 20);
+            this.textBoxTargetSubnet.Size = new System.Drawing.Size(143, 20);
             this.textBoxTargetSubnet.TabIndex = 15;
             this.textBoxTargetSubnet.Text = "192.168.1.0";
-            this.textBoxTargetSubnet.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 348);
+            this.label1.Location = new System.Drawing.Point(391, 164);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(72, 13);
             this.label1.TabIndex = 16;
@@ -209,18 +220,65 @@
             // 
             // textBoxSubnetIdentifier
             // 
-            this.textBoxSubnetIdentifier.Location = new System.Drawing.Point(235, 345);
+            this.textBoxSubnetIdentifier.Location = new System.Drawing.Point(753, 63);
             this.textBoxSubnetIdentifier.Name = "textBoxSubnetIdentifier";
             this.textBoxSubnetIdentifier.ReadOnly = true;
-            this.textBoxSubnetIdentifier.Size = new System.Drawing.Size(23, 20);
+            this.textBoxSubnetIdentifier.Size = new System.Drawing.Size(35, 20);
             this.textBoxSubnetIdentifier.TabIndex = 17;
-            this.textBoxSubnetIdentifier.Text = "/24";
+            this.textBoxSubnetIdentifier.Text = "WIP";
             // 
-            // Form1
+            // textBoxTargetSubnetIdentifier
+            // 
+            this.textBoxTargetSubnetIdentifier.Location = new System.Drawing.Point(614, 160);
+            this.textBoxTargetSubnetIdentifier.Name = "textBoxTargetSubnetIdentifier";
+            this.textBoxTargetSubnetIdentifier.Size = new System.Drawing.Size(27, 20);
+            this.textBoxTargetSubnetIdentifier.TabIndex = 18;
+            this.textBoxTargetSubnetIdentifier.Text = "WIP";
+            // 
+            // textBoxRangeMin
+            // 
+            this.textBoxRangeMin.Location = new System.Drawing.Point(469, 185);
+            this.textBoxRangeMin.Name = "textBoxRangeMin";
+            this.textBoxRangeMin.Size = new System.Drawing.Size(49, 20);
+            this.textBoxRangeMin.TabIndex = 19;
+            this.textBoxRangeMin.Text = "0";
+            // 
+            // textBoxRangeMax
+            // 
+            this.textBoxRangeMax.Location = new System.Drawing.Point(563, 185);
+            this.textBoxRangeMax.Name = "textBoxRangeMax";
+            this.textBoxRangeMax.Size = new System.Drawing.Size(49, 20);
+            this.textBoxRangeMax.TabIndex = 20;
+            this.textBoxRangeMax.Text = "255";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(393, 189);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(74, 13);
+            this.label2.TabIndex = 21;
+            this.label2.Text = "Range    from:";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(538, 189);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(19, 13);
+            this.label3.TabIndex = 22;
+            this.label3.Text = "to:";
+            // 
+            // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 410);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.textBoxRangeMax);
+            this.Controls.Add(this.textBoxRangeMin);
+            this.Controls.Add(this.textBoxTargetSubnetIdentifier);
             this.Controls.Add(this.textBoxSubnetIdentifier);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.textBoxTargetSubnet);
@@ -238,9 +296,9 @@
             this.Controls.Add(this.labelIP4);
             this.Controls.Add(this.buttonPing);
             this.Controls.Add(this.buttonSearch);
-            this.Controls.Add(this.listBox1);
-            this.Name = "Form1";
-            this.Text = "Form1";
+            this.Controls.Add(this.ListBoxResults);
+            this.Name = "MainForm";
+            this.Text = "NetDisc";
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -248,7 +306,7 @@
 
         #endregion
 
-        private System.Windows.Forms.ListBox listBox1;
+        private System.Windows.Forms.ListBox ListBoxResults;
         private System.Windows.Forms.Button buttonSearch;
         private System.Windows.Forms.Button buttonPing;
         private System.Windows.Forms.Label labelIP4;
@@ -267,6 +325,11 @@
         private System.Windows.Forms.TextBox textBoxTargetSubnet;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox textBoxSubnetIdentifier;
+        private System.Windows.Forms.TextBox textBoxTargetSubnetIdentifier;
+        private System.Windows.Forms.TextBox textBoxRangeMin;
+        private System.Windows.Forms.TextBox textBoxRangeMax;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label3;
     }
 }
 
