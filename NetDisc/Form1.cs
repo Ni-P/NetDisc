@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -23,6 +21,7 @@ namespace NetDisc
         private int firstHost;
         private int lastHost;
         private Queue<PingReply> pingResults;
+        private bool _isPinging = false;
 
         private IPAddress IPv4;
         private IPAddress IPv6;
@@ -36,27 +35,16 @@ namespace NetDisc
             netTools = new NetworkTools();
             ReadHostInterface();
             UpdateHostAddresses();
-            pingTimeout = 100;
-            timeToLive = 30;
+            pingTimeout = Convert.ToInt32(this.textBoxTimeout.Text);
+            timeToLive = Convert.ToInt32(this.textBoxTTL.Text);
             dontFragment = true;
             this.textBoxTarget.Text = this.IPv4.ToString();
-            //ListBoxTest();
+
         }
 
-        private void ListBoxTest()
-        {
-            ListBoxResults.Items.Add(IPv4);
-            ListBoxResults.Items.Add(IPv6);
-            ListBoxResults.Items.Add(SubnetMask);
-            try
-            {
-                pingResults.Dequeue();
-
-            } catch (ThreadInterruptedException e)
-            {
-
-            }
-        }
+        private delegate void _AddtoListBox(PingReply reply);
+        private delegate PingReply _PingInThread(string ip);
+        //private delegate void _
 
         private void ReadHostInterface()
         {
@@ -95,35 +83,43 @@ namespace NetDisc
 
         private void buttonPing_Click(object sender, EventArgs e)
         {
-            Console.WriteLine("buttonPing clicked.");
+            //Console.WriteLine("buttonPing clicked.");
             Lockbuttons();
-            backgroundPinger.RunWorkerAsync(textBoxTarget.Text);
+            handlePingResults(PingTask(textBoxTarget.Text));
             Unlockbuttons();
         }
 
         private void buttonSearch_Click(object sender, EventArgs e)
         {
             Lockbuttons();
+            //_PingInThread threadDelegate = PingTask;
             string subnetInput = this.textBoxTargetSubnet.Text;
             string[] subnetBaseArr = subnetInput.Trim().Split('.');
             string subnetbase = subnetBaseArr[0]+ "." + subnetBaseArr[1] + "." + subnetBaseArr[2];
+            this.firstHost = (int)Convert.ToInt32(this.textBoxRangeMin.Text);
+            this.lastHost = (int)Convert.ToInt32(this.textBoxRangeMax.Text);
             List<PingReply> replyList = new List<PingReply>();
-            for (int i=50;i<110;i++)
+            for (int ip=this.firstHost;ip< this.lastHost; ip++)
             {
-                replyList.Add(PingTask(subnetbase+"."+i));
+                new Thread((targetip)=> {
+                    PingReply rep = PingTask(targetip.ToString());
+                    replyList.Add(rep);
+                    handlePingResults(rep);
+                }).Start(subnetbase + "." + ip);
+                //replyList.Add(PingTask(subnetbase+"."+ip));
 
             }
             Unlockbuttons();
-            foreach(PingReply rep in replyList)
-            {
-                if (rep.Status == IPStatus.Success) this.ListBoxResults.Items.Add("Found host at: " + rep.Address);
-                //else this.ListBoxResults.Items.Add("Host at: " + rep.Address+" Failed to respond.");
+            //foreach(PingReply rep in replyList)
+            //{
+            //    if (rep.Status == IPStatus.Success) this.ListBoxResults.Items.Add("Found host at: " + rep.Address);
+            //    //else this.ListBoxResults.Items.Add("Host at: " + rep.Address+" Failed to respond.");
 
-            }
+            //}
             //this.ListBoxResults.Items.AddRange(replyList.ToArray());
         }
 
-        public PingReply PingTask(string address)
+        private PingReply PingTask(string address)
         {
             Task<PingReply> ping = Task.Run(() =>
             {
@@ -144,51 +140,32 @@ namespace NetDisc
             return ping.Result;
         }
 
+        #region backgroundTask
         private void backgroundPinger_DoWork(object sender, DoWorkEventArgs e)
         {
             
             BackgroundWorker worker = sender as BackgroundWorker;
-
-            if (e.Argument.GetType() == typeof(List<string>))
+            while(_isPinging)
             {
-                List<PingReply> replies = new List<PingReply>();
-                PingReply reply;
-                foreach (string addr in (List<string>)e.Argument)
-                {
-                    reply = netTools.SendPing(addr, this.pingTimeout, new PingOptions(this.timeToLive, this.dontFragment));
-                    replies.Add(reply);
-                }
-                e.Result = replies;
-            } else
-            {
-                PingReply reply = netTools.SendPing(e.Argument, this.pingTimeout, new PingOptions(this.timeToLive, this.dontFragment));
-                e.Result = reply;
 
             }
+
 
         }
 
         private void backgroundPinger_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            
+
             if (e.Error != null)
             {
                 Console.WriteLine("Error at backgroundPinger");
             }
-            else {
-                if(e.Result.GetType()==typeof(List<PingReply>))
-                {
-                    foreach(PingReply reply in (List<PingReply>)e.Result)
-                    {
-                        handlePingResults(reply);
-                    }
-                } else
-                {
-                    handlePingResults((PingReply)e.Result);
+            else
+            {
 
-                }
             }
         }
+        #endregion
 
         private void handlePingResults(PingReply reply)
         {
@@ -197,7 +174,16 @@ namespace NetDisc
                 Console.WriteLine("Ping to "+reply.Address+" was a success");
                 Console.WriteLine("Address " + reply.Address);
                 Console.WriteLine("Roundtrip time " + reply.RoundtripTime);
-                this.ListBoxResults.Items.Add("Ping to host: " + reply.Address + " was successfull.");
+                if (this.InvokeRequired)
+                {
+                    this.Invoke(new Action(()=>
+                    {
+                        this.ListBoxResults.Items.Add("Ping to host: " + reply.Address + " was successfull.");
+                    }));
+                } else
+                {
+                    this.ListBoxResults.Items.Add("Ping to host: " + reply.Address + " was successfull.");
+                }
                 
             }
             else

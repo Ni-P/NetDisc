@@ -52,6 +52,10 @@
             this.textBoxRangeMax = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
+            this.textBoxTTL = new System.Windows.Forms.TextBox();
+            this.labelTTL = new System.Windows.Forms.Label();
+            this.labelTimeut = new System.Windows.Forms.Label();
+            this.textBoxTimeout = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // ListBoxResults
@@ -74,7 +78,7 @@
             // 
             // buttonPing
             // 
-            this.buttonPing.Location = new System.Drawing.Point(647, 130);
+            this.buttonPing.Location = new System.Drawing.Point(647, 127);
             this.buttonPing.Name = "buttonPing";
             this.buttonPing.Size = new System.Drawing.Size(141, 23);
             this.buttonPing.TabIndex = 2;
@@ -180,15 +184,15 @@
             // labelTarget
             // 
             this.labelTarget.AutoSize = true;
-            this.labelTarget.Location = new System.Drawing.Point(398, 135);
+            this.labelTarget.Location = new System.Drawing.Point(391, 132);
             this.labelTarget.Name = "labelTarget";
-            this.labelTarget.Size = new System.Drawing.Size(38, 13);
+            this.labelTarget.Size = new System.Drawing.Size(63, 13);
             this.labelTarget.TabIndex = 13;
-            this.labelTarget.Text = "Target";
+            this.labelTarget.Text = "Target Host";
             // 
             // textBoxTarget
             // 
-            this.textBoxTarget.Location = new System.Drawing.Point(469, 132);
+            this.textBoxTarget.Location = new System.Drawing.Point(469, 128);
             this.textBoxTarget.Name = "textBoxTarget";
             this.textBoxTarget.Size = new System.Drawing.Size(143, 20);
             this.textBoxTarget.TabIndex = 14;
@@ -269,11 +273,51 @@
             this.label3.TabIndex = 22;
             this.label3.Text = "to:";
             // 
+            // textBoxTTL
+            // 
+            this.textBoxTTL.Location = new System.Drawing.Point(469, 210);
+            this.textBoxTTL.Name = "textBoxTTL";
+            this.textBoxTTL.Size = new System.Drawing.Size(49, 20);
+            this.textBoxTTL.TabIndex = 23;
+            this.textBoxTTL.Text = "30";
+            // 
+            // labelTTL
+            // 
+            this.labelTTL.AutoSize = true;
+            this.labelTTL.Location = new System.Drawing.Point(393, 214);
+            this.labelTTL.Name = "labelTTL";
+            this.labelTTL.Size = new System.Drawing.Size(69, 13);
+            this.labelTTL.TabIndex = 24;
+            this.labelTTL.Text = "Time To Live";
+            // 
+            // labelTimeut
+            // 
+            this.labelTimeut.AutoSize = true;
+            this.labelTimeut.Location = new System.Drawing.Point(393, 240);
+            this.labelTimeut.Name = "labelTimeut";
+            this.labelTimeut.Size = new System.Drawing.Size(45, 13);
+            this.labelTimeut.TabIndex = 26;
+            this.labelTimeut.Text = "Timeout";
+            // 
+            // textBoxTimeout
+            // 
+            this.textBoxTimeout.Location = new System.Drawing.Point(469, 236);
+            this.textBoxTimeout.Name = "textBoxTimeout";
+            this.textBoxTimeout.Size = new System.Drawing.Size(49, 20);
+            this.textBoxTimeout.TabIndex = 25;
+            this.textBoxTimeout.Text = "1000";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoSize = true;
+            this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(800, 410);
+            this.Controls.Add(this.labelTimeut);
+            this.Controls.Add(this.textBoxTimeout);
+            this.Controls.Add(this.labelTTL);
+            this.Controls.Add(this.textBoxTTL);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.textBoxRangeMax);
@@ -330,6 +374,10 @@
         private System.Windows.Forms.TextBox textBoxRangeMax;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox textBoxTTL;
+        private System.Windows.Forms.Label labelTTL;
+        private System.Windows.Forms.Label labelTimeut;
+        private System.Windows.Forms.TextBox textBoxTimeout;
     }
 }
 
