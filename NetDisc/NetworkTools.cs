@@ -20,11 +20,19 @@ namespace NetDisc
         {
             Ping ping = new Ping();
 
-            string data = "one ping Vasilyi!";
+            string data = "one ping only!";
             byte[] buffer = Encoding.ASCII.GetBytes(data);
+            try
+            {
+                PingReply reply = ping.Send(target.ToString(), timeout, buffer, options);
+                return reply;
 
-            PingReply reply = ping.Send(target.ToString(), timeout, buffer, options);
-            return reply;
+            } catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
+            }
+            
         }
 
 
@@ -70,7 +78,7 @@ namespace NetDisc
 
         public string getMAC(NetworkInterface networkInterface)
         {
-            
+
             return networkInterface.GetPhysicalAddress().ToString();
         }
 

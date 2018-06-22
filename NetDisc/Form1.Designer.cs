@@ -56,6 +56,9 @@
             this.labelTTL = new System.Windows.Forms.Label();
             this.labelTimeut = new System.Windows.Forms.Label();
             this.textBoxTimeout = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.checkBoxIPonly = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // ListBoxResults
@@ -72,15 +75,15 @@
             this.buttonSearch.Name = "buttonSearch";
             this.buttonSearch.Size = new System.Drawing.Size(141, 23);
             this.buttonSearch.TabIndex = 1;
-            this.buttonSearch.Text = "Search";
+            this.buttonSearch.Text = "Scan Subnet";
             this.buttonSearch.UseVisualStyleBackColor = true;
             this.buttonSearch.Click += new System.EventHandler(this.buttonSearch_Click);
             // 
             // buttonPing
             // 
-            this.buttonPing.Location = new System.Drawing.Point(647, 127);
+            this.buttonPing.Location = new System.Drawing.Point(683, 127);
             this.buttonPing.Name = "buttonPing";
-            this.buttonPing.Size = new System.Drawing.Size(141, 23);
+            this.buttonPing.Size = new System.Drawing.Size(105, 23);
             this.buttonPing.TabIndex = 2;
             this.buttonPing.Text = "Ping";
             this.buttonPing.UseVisualStyleBackColor = true;
@@ -89,11 +92,12 @@
             // labelIP4
             // 
             this.labelIP4.AutoSize = true;
-            this.labelIP4.Location = new System.Drawing.Point(393, 13);
+            this.labelIP4.Location = new System.Drawing.Point(393, 17);
             this.labelIP4.Name = "labelIP4";
             this.labelIP4.Size = new System.Drawing.Size(54, 13);
             this.labelIP4.TabIndex = 3;
             this.labelIP4.Text = "Host IPv4";
+            this.labelIP4.Click += new System.EventHandler(this.labelIP4_Click);
             // 
             // labelIP6
             // 
@@ -138,7 +142,7 @@
             // labelMAC
             // 
             this.labelMAC.AutoSize = true;
-            this.labelMAC.Location = new System.Drawing.Point(611, 14);
+            this.labelMAC.Location = new System.Drawing.Point(611, 17);
             this.labelMAC.Name = "labelMAC";
             this.labelMAC.Size = new System.Drawing.Size(30, 13);
             this.labelMAC.TabIndex = 7;
@@ -198,6 +202,7 @@
             this.textBoxTarget.TabIndex = 14;
             this.textBoxTarget.Text = "localhost";
             this.textBoxTarget.TextChanged += new System.EventHandler(this.textBoxTarget_TextChanged);
+            this.textBoxTarget.Validating += new System.ComponentModel.CancelEventHandler(this.textBoxTarget_Validating);
             // 
             // backgroundPinger
             // 
@@ -242,18 +247,22 @@
             // textBoxRangeMin
             // 
             this.textBoxRangeMin.Location = new System.Drawing.Point(469, 185);
+            this.textBoxRangeMin.MaxLength = 3;
             this.textBoxRangeMin.Name = "textBoxRangeMin";
             this.textBoxRangeMin.Size = new System.Drawing.Size(49, 20);
             this.textBoxRangeMin.TabIndex = 19;
             this.textBoxRangeMin.Text = "0";
+            this.textBoxRangeMin.Validating += new System.ComponentModel.CancelEventHandler(this.textBoxRangeMin_Validating);
             // 
             // textBoxRangeMax
             // 
             this.textBoxRangeMax.Location = new System.Drawing.Point(563, 185);
+            this.textBoxRangeMax.MaxLength = 3;
             this.textBoxRangeMax.Name = "textBoxRangeMax";
             this.textBoxRangeMax.Size = new System.Drawing.Size(49, 20);
             this.textBoxRangeMax.TabIndex = 20;
             this.textBoxRangeMax.Text = "255";
+            this.textBoxRangeMax.Validating += new System.ComponentModel.CancelEventHandler(this.textBoxRangeMax_Validating);
             // 
             // label2
             // 
@@ -280,6 +289,7 @@
             this.textBoxTTL.Size = new System.Drawing.Size(49, 20);
             this.textBoxTTL.TabIndex = 23;
             this.textBoxTTL.Text = "30";
+            this.textBoxTTL.WordWrap = false;
             // 
             // labelTTL
             // 
@@ -307,13 +317,45 @@
             this.textBoxTimeout.TabIndex = 25;
             this.textBoxTimeout.Text = "1000";
             // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(522, 214);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(30, 13);
+            this.label4.TabIndex = 27;
+            this.label4.Text = "hops";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(522, 239);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(63, 13);
+            this.label5.TabIndex = 28;
+            this.label5.Text = "milliseconds";
+            // 
+            // checkBoxIPonly
+            // 
+            this.checkBoxIPonly.AutoSize = true;
+            this.checkBoxIPonly.Location = new System.Drawing.Point(619, 130);
+            this.checkBoxIPonly.Name = "checkBoxIPonly";
+            this.checkBoxIPonly.Size = new System.Drawing.Size(58, 17);
+            this.checkBoxIPonly.TabIndex = 29;
+            this.checkBoxIPonly.Text = "IP only";
+            this.checkBoxIPonly.UseVisualStyleBackColor = true;
+            this.checkBoxIPonly.CheckedChanged += new System.EventHandler(this.checkBoxIPonly_CheckedChanged);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(800, 410);
+            this.ClientSize = new System.Drawing.Size(800, 362);
+            this.Controls.Add(this.checkBoxIPonly);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.label4);
             this.Controls.Add(this.labelTimeut);
             this.Controls.Add(this.textBoxTimeout);
             this.Controls.Add(this.labelTTL);
@@ -378,6 +420,9 @@
         private System.Windows.Forms.Label labelTTL;
         private System.Windows.Forms.Label labelTimeut;
         private System.Windows.Forms.TextBox textBoxTimeout;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.CheckBox checkBoxIPonly;
     }
 }
 

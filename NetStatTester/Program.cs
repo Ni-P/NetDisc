@@ -25,7 +25,7 @@ namespace NetStatTester
             //IPAddress iptest = GetSubnetMask(IPAddress.Parse("192.168.1.107"));
             //Console.WriteLine(iptest);
             //Console.WriteLine(iptest);
-            for(int i=0;i<108;i++)
+            for (int i = 0; i < 108; i++)
             {
                 ThreadTest(i);
 
@@ -46,7 +46,7 @@ namespace NetStatTester
             {
                 //Console.WriteLine("at Task result callback");
                 Console.WriteLine(ping.Result.Address);
-                
+
             });
 
         }
@@ -61,7 +61,7 @@ namespace NetStatTester
                 DontFragment = true
             };
             int timeout = 1000;
-            string address = "192.168.1."+index;
+            string address = "192.168.1." + index;
 
             string data = "one ping Vasilyi!";
             byte[] buffer = Encoding.ASCII.GetBytes(data);
@@ -73,12 +73,14 @@ namespace NetStatTester
                 {
                     Console.WriteLine("Ping success");
                     return reply;
-                } else
+                }
+                else
                 {
                     //Console.WriteLine("Ping failed");
                     return reply;
                 }
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 Console.WriteLine(e);
                 return null;
@@ -109,11 +111,11 @@ namespace NetStatTester
 
         private static void PingCallback(object sender, PingCompletedEventArgs e)
         {
-            if(e.Reply.Status == IPStatus.Success)
+            if (e.Reply.Status == IPStatus.Success)
             {
                 Console.WriteLine("Ping was successfull.");
-                Console.WriteLine("Address "+e.Reply.Address);
-                Console.WriteLine("Roundtrip time "+e.Reply.RoundtripTime);
+                Console.WriteLine("Address " + e.Reply.Address);
+                Console.WriteLine("Roundtrip time " + e.Reply.RoundtripTime);
             }
             else
             {
@@ -140,23 +142,25 @@ namespace NetStatTester
             try
             {
 
-            if (reply.Status == IPStatus.Success)
-            {
-                Console.WriteLine("Address: {0}", reply.Address.ToString());
-                Console.WriteLine("RoundTrip time: {0}", reply.RoundtripTime);
-                //Console.WriteLine("Time to live: {0}", reply.Options.Ttl);
-                //Console.WriteLine("Don't fragment: {0}", reply.Options.DontFragment);
-                //Console.WriteLine("Buffer size: {0}", reply.Buffer.Length);
-            } else
+                if (reply.Status == IPStatus.Success)
+                {
+                    Console.WriteLine("Address: {0}", reply.Address.ToString());
+                    Console.WriteLine("RoundTrip time: {0}", reply.RoundtripTime);
+                    //Console.WriteLine("Time to live: {0}", reply.Options.Ttl);
+                    //Console.WriteLine("Don't fragment: {0}", reply.Options.DontFragment);
+                    //Console.WriteLine("Buffer size: {0}", reply.Buffer.Length);
+                }
+                else
                 {
                     Console.WriteLine("Ping failed " + reply.Status);
                 }
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 Console.WriteLine(e.ToString());
             }
         }
-        
+
 
 
         public static void GetInterface()
@@ -165,9 +169,9 @@ namespace NetStatTester
             NetworkInterface[] interfaces = NetworkInterface.GetAllNetworkInterfaces();
             foreach (NetworkInterface adapter in interfaces)
             {
-                if(adapter.NetworkInterfaceType != NetworkInterfaceType.Loopback)
+                if (adapter.NetworkInterfaceType != NetworkInterfaceType.Loopback)
                 {
-                    if(adapter.OperationalStatus == OperationalStatus.Up)
+                    if (adapter.OperationalStatus == OperationalStatus.Up)
                     {
                         properties = adapter.GetIPProperties();
                         //Console.WriteLine("selected " + adapter.Name);
