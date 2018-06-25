@@ -15,11 +15,12 @@ namespace NetDisc
     {
         private NetworkInterface networkInterface;
         private NetworkTools netTools;
-        private int pingTimeout;
-        private int timeToLive;
-        private bool dontFragment;
-        private int firstHost;
-        private int lastHost;
+        private int pingTimeout = 4000;
+        private int timeToLive = 30;
+        private bool dontFragment = true;
+        private int firstHost = 0;
+        private int lastHost = 255;
+        private int bufferSize = 32;
         private bool _isPinging = false;
 
         private int pendingPings = 0;
@@ -29,6 +30,7 @@ namespace NetDisc
         private string MAC;
         private IPAddress Gateway;
         private IPAddress SubnetMask;
+        private bool showUnsuccessfullPings;
 
         public MainForm()
         {
@@ -40,7 +42,10 @@ namespace NetDisc
             timeToLive = Convert.ToInt32(this.textBoxTTL.Text);
             dontFragment = true;
             this.textBoxTarget.Text = this.IPv4.ToString();
-
+            this.FormClosed += (object o, FormClosedEventArgs e) =>
+            {
+                Environment.Exit(0);
+            };
         }
 
         private delegate void _AddtoListBox(PingReply reply);
@@ -86,7 +91,7 @@ namespace NetDisc
         {
             //Console.WriteLine("buttonPing clicked.");
             Lockbuttons();
-            handlePingResults(PingTask(textBoxTarget.Text));
+            handlePingResults(PingTask(textBoxTarget.Text), textBoxTarget.Text);
             Unlockbuttons();
         }
 
@@ -107,10 +112,11 @@ namespace NetDisc
             {
                 new Thread((targetip) =>
                 {
+                    Thread.CurrentThread.IsBackground = false; // so the threads won't keep running when the form closes
                     this.pendingPings++;
                     PingReply rep = PingTask(targetip.ToString());
                     replyList.Add(rep);
-                    handlePingResults(rep);
+                    handlePingResults(rep, targetip.ToString());
                     this.pendingPings--;
                 }).Start(subnetbase + "." + ip);
                 //replyList.Add(PingTask(subnetbase+"."+ip));
@@ -131,6 +137,7 @@ namespace NetDisc
                     this.Invoke(new Action(() =>
                         {
                             this.ListBoxResults.Items.Add("Scanning complete");
+                            DoAutoscroll();
                             Unlockbuttons();
                         }));
                 }
@@ -202,7 +209,7 @@ namespace NetDisc
         }
         #endregion
 
-        private void handlePingResults(PingReply reply)
+        private void handlePingResults(PingReply reply, string ip)
         {
             if (reply == null)
             {
@@ -210,12 +217,15 @@ namespace NetDisc
                 {
                     this.Invoke(new Action(() =>
                     {
-                        this.ListBoxResults.Items.Add("Ping failed");
+                        this.ListBoxResults.Items.Add("Ping operation failed");
+                        DoAutoscroll();
+
+
                     }));
                 }
                 else
                 {
-                    this.ListBoxResults.Items.Add("Ping failed");
+                    this.ListBoxResults.Items.Add("Ping operation failed");
                 }
             }
             else
@@ -227,22 +237,69 @@ namespace NetDisc
                     Console.WriteLine("Roundtrip time " + reply.RoundtripTime);
                     if (this.InvokeRequired)
                     {
-                        this.Invoke(new Action(() =>
+                        try
                         {
-                            this.ListBoxResults.Items.Add("Ping to host: " + reply.Address + " was successfull.");
-                        }));
+
+                            this.Invoke(new Action(() =>
+                            {
+                                this.ListBoxResults.Items.Add("Reply from:  " + reply.Address + "    bytes=" + reply.Buffer.Length + "    RTT=" + reply.RoundtripTime);
+                                DoAutoscroll();
+                            }));
+                        }
+                        catch (ObjectDisposedException e)
+                        {
+                            Console.WriteLine(e.Message);
+                            Environment.Exit(0);
+                        }
                     }
                     else
                     {
-                        this.ListBoxResults.Items.Add("Ping to host: " + reply.Address + " was successfull.");
+                        this.ListBoxResults.Items.Add("Reply from:  " + reply.Address + "    bytes=" + reply.Buffer.Length + "    RTT=" + reply.RoundtripTime);
+                        DoAutoscroll();
                     }
 
                 }
                 else
                 {
-                    Console.WriteLine("Ping to " + reply.Address + " failed, reason: " + reply.Status);
+                    if (showUnsuccessfullPings)
+                    {
+                        if (this.InvokeRequired)
+                        {
+                            try
+                            {
+
+                                this.Invoke(new Action(() =>
+                                {
+                                    this.ListBoxResults.Items.Add("Ping to        " + ip + "    failed,    reason: " + reply.Status);
+                                    DoAutoscroll();
+                                }));
+                            }
+                            catch (ObjectDisposedException e)
+                            {
+                                Console.WriteLine(e.Message);
+                                Environment.Exit(0);
+                            }
+                        }
+
+                    }
+                    else
+                    {
+                        Console.WriteLine("Ping to " + ip + " failed, reason: " + reply.Status);
+
+                    }
                 }
             }
+        }
+
+        private void DoAutoscroll()
+        {
+
+            if (this.ListBoxResults.Items.Count >= 24)
+            {
+                this.ListBoxResults.TopIndex = this.ListBoxResults.Items.Count - 23;
+            }
+
+
         }
 
         private void ScourSubnet()
@@ -400,6 +457,11 @@ namespace NetDisc
                 Console.WriteLine(e.Message);
                 return 0;
             }
+            catch (OverflowException e)
+            {
+                Console.WriteLine(e.Message);
+                return 0;
+            }
 
 
         }
@@ -446,7 +508,7 @@ namespace NetDisc
 
         private void textBoxRangeMin_Validating(object sender, CancelEventArgs e)
         {
-            if (this.textBoxRangeMin.Text == "") this.textBoxRangeMin.Text = "0";
+            if (this.textBoxRangeMin.Text == "") this.textBoxRangeMin.Text = this.firstHost.ToString();
             else
             {
                 int value = ValidateInteger(this.textBoxRangeMin.Text);
@@ -472,7 +534,7 @@ namespace NetDisc
 
         private void textBoxRangeMax_Validating(object sender, CancelEventArgs e)
         {
-            if (this.textBoxRangeMax.Text == "") this.textBoxRangeMax.Text = "255";
+            if (this.textBoxRangeMax.Text == "") this.textBoxRangeMax.Text = this.lastHost.ToString();
             else
             {
                 int value = ValidateInteger(this.textBoxRangeMax.Text);
@@ -501,12 +563,101 @@ namespace NetDisc
 
         private void checkBoxIPonly_CheckedChanged(object sender, EventArgs e)
         {
-            if (this.checkBoxIPonly.Checked) textBoxTarget_Validating(sender,new CancelEventArgs());
+            if (this.checkBoxIPonly.Checked) textBoxTarget_Validating(sender, new CancelEventArgs());
         }
 
         private void labelIP4_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void checkBoxShowFailedPings_CheckStateChanged(object sender, EventArgs e)
+        {
+            this.showUnsuccessfullPings = this.checkBoxShowFailedPings.Checked;
+        }
+
+        private void textBoxBufferSize_Validating(object sender, CancelEventArgs e)
+        {
+            ValidateBufferSize();
+        }
+
+        private void ValidateBufferSize()
+        {
+            int value = 32;
+            try
+            {
+                value = Convert.ToInt32(this.textBoxBufferSize.Text);
+                if (value > 65500) value = 65500;
+                else if (value < 1) value = 1;
+
+
+            }
+            catch (FormatException fe)
+            {
+                this.bufferSize = 32;
+            }
+            catch (OverflowException oe)
+            {
+
+                this.bufferSize = 32;
+            }
+            finally
+            {
+                this.textBoxBufferSize.Text = value.ToString();
+                this.bufferSize = value;
+            }
+        }
+
+        private void textBoxTTL_Validating(object sender, CancelEventArgs e)
+        {
+            if (this.textBoxTTL.Text == "") this.textBoxTTL.Text = this.timeToLive.ToString();
+            else
+            {
+                int value = ValidateInteger(this.textBoxTTL.Text);
+
+                if (value <= 0)
+                {
+                    this.textBoxTTL.Text = "1";
+                    this.timeToLive = 1;
+                }
+                else if (value > 255)
+                {
+                    this.textBoxTTL.Text = "255";
+                    this.timeToLive = 255;
+
+                }
+                else
+                {
+                    this.timeToLive = value;
+
+                }
+            }
+        }
+
+        private void textBoxTimeout_Validating(object sender, CancelEventArgs e)
+        {
+            if (this.textBoxTimeout.Text == "") this.textBoxTimeout.Text = this.pingTimeout.ToString();
+            else
+            {
+                int value = ValidateInteger(this.textBoxTimeout.Text);
+
+                if (value <= 0)
+                {
+                    this.textBoxTimeout.Text = "1";
+                    this.pingTimeout = 1;
+                }
+                else if (value > 10000)
+                {
+                    this.textBoxTimeout.Text = "10000";
+                    this.pingTimeout = 10000;
+
+                }
+                else
+                {
+                    this.pingTimeout = value;
+
+                }
+            }
         }
     }
 }

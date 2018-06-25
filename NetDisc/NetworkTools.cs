@@ -16,12 +16,19 @@ namespace NetDisc
 
         }
 
-        public PingReply SendPing(object target, int timeout, PingOptions options)
+        public PingReply SendPing(object target, int timeout, PingOptions options, int bufferSize=32)
         {
             Ping ping = new Ping();
 
             string data = "one ping only!";
-            byte[] buffer = Encoding.ASCII.GetBytes(data);
+            //byte[] buffer = Encoding.ASCII.GetBytes(data);
+            byte[] buffer = new byte[bufferSize];
+            //for(int i=0; i < bufferSize; i++)
+            //{
+            //    char c = new Random().Next(256);
+            //}
+            new Random().NextBytes(buffer);
+
             try
             {
                 PingReply reply = ping.Send(target.ToString(), timeout, buffer, options);

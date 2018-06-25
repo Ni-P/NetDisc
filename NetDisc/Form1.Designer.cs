@@ -59,6 +59,9 @@
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.checkBoxIPonly = new System.Windows.Forms.CheckBox();
+            this.checkBoxShowFailedPings = new System.Windows.Forms.CheckBox();
+            this.textBoxBufferSize = new System.Windows.Forms.TextBox();
+            this.label6 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // ListBoxResults
@@ -66,6 +69,7 @@
             this.ListBoxResults.FormattingEnabled = true;
             this.ListBoxResults.Location = new System.Drawing.Point(12, 12);
             this.ListBoxResults.Name = "ListBoxResults";
+            this.ListBoxResults.ScrollAlwaysVisible = true;
             this.ListBoxResults.Size = new System.Drawing.Size(364, 329);
             this.ListBoxResults.TabIndex = 0;
             // 
@@ -201,6 +205,7 @@
             this.textBoxTarget.Size = new System.Drawing.Size(143, 20);
             this.textBoxTarget.TabIndex = 14;
             this.textBoxTarget.Text = "localhost";
+            this.textBoxTarget.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.textBoxTarget.TextChanged += new System.EventHandler(this.textBoxTarget_TextChanged);
             this.textBoxTarget.Validating += new System.ComponentModel.CancelEventHandler(this.textBoxTarget_Validating);
             // 
@@ -216,6 +221,7 @@
             this.textBoxTargetSubnet.Size = new System.Drawing.Size(143, 20);
             this.textBoxTargetSubnet.TabIndex = 15;
             this.textBoxTargetSubnet.Text = "192.168.1.0";
+            this.textBoxTargetSubnet.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
             // label1
             // 
@@ -252,6 +258,7 @@
             this.textBoxRangeMin.Size = new System.Drawing.Size(49, 20);
             this.textBoxRangeMin.TabIndex = 19;
             this.textBoxRangeMin.Text = "0";
+            this.textBoxRangeMin.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.textBoxRangeMin.Validating += new System.ComponentModel.CancelEventHandler(this.textBoxRangeMin_Validating);
             // 
             // textBoxRangeMax
@@ -262,6 +269,7 @@
             this.textBoxRangeMax.Size = new System.Drawing.Size(49, 20);
             this.textBoxRangeMax.TabIndex = 20;
             this.textBoxRangeMax.Text = "255";
+            this.textBoxRangeMax.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.textBoxRangeMax.Validating += new System.ComponentModel.CancelEventHandler(this.textBoxRangeMax_Validating);
             // 
             // label2
@@ -289,7 +297,9 @@
             this.textBoxTTL.Size = new System.Drawing.Size(49, 20);
             this.textBoxTTL.TabIndex = 23;
             this.textBoxTTL.Text = "30";
+            this.textBoxTTL.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.textBoxTTL.WordWrap = false;
+            this.textBoxTTL.Validating += new System.ComponentModel.CancelEventHandler(this.textBoxTTL_Validating);
             // 
             // labelTTL
             // 
@@ -316,6 +326,8 @@
             this.textBoxTimeout.Size = new System.Drawing.Size(49, 20);
             this.textBoxTimeout.TabIndex = 25;
             this.textBoxTimeout.Text = "1000";
+            this.textBoxTimeout.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.textBoxTimeout.Validating += new System.ComponentModel.CancelEventHandler(this.textBoxTimeout_Validating);
             // 
             // label4
             // 
@@ -346,13 +358,45 @@
             this.checkBoxIPonly.UseVisualStyleBackColor = true;
             this.checkBoxIPonly.CheckedChanged += new System.EventHandler(this.checkBoxIPonly_CheckedChanged);
             // 
+            // checkBoxShowFailedPings
+            // 
+            this.checkBoxShowFailedPings.AutoSize = true;
+            this.checkBoxShowFailedPings.Location = new System.Drawing.Point(647, 187);
+            this.checkBoxShowFailedPings.Name = "checkBoxShowFailedPings";
+            this.checkBoxShowFailedPings.Size = new System.Drawing.Size(109, 17);
+            this.checkBoxShowFailedPings.TabIndex = 30;
+            this.checkBoxShowFailedPings.Text = "Show failed pings";
+            this.checkBoxShowFailedPings.UseVisualStyleBackColor = true;
+            this.checkBoxShowFailedPings.CheckStateChanged += new System.EventHandler(this.checkBoxShowFailedPings_CheckStateChanged);
+            // 
+            // textBoxBufferSize
+            // 
+            this.textBoxBufferSize.Location = new System.Drawing.Point(469, 262);
+            this.textBoxBufferSize.Name = "textBoxBufferSize";
+            this.textBoxBufferSize.Size = new System.Drawing.Size(49, 20);
+            this.textBoxBufferSize.TabIndex = 31;
+            this.textBoxBufferSize.Text = "32";
+            this.textBoxBufferSize.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.textBoxBufferSize.Validating += new System.ComponentModel.CancelEventHandler(this.textBoxBufferSize_Validating);
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(394, 266);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(71, 13);
+            this.label6.TabIndex = 32;
+            this.label6.Text = "Bytes to send";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.AutoSize = true;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(800, 362);
+            this.ClientSize = new System.Drawing.Size(799, 354);
+            this.Controls.Add(this.label6);
+            this.Controls.Add(this.textBoxBufferSize);
+            this.Controls.Add(this.checkBoxShowFailedPings);
             this.Controls.Add(this.checkBoxIPonly);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.label4);
@@ -423,6 +467,9 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.CheckBox checkBoxIPonly;
+        private System.Windows.Forms.CheckBox checkBoxShowFailedPings;
+        private System.Windows.Forms.TextBox textBoxBufferSize;
+        private System.Windows.Forms.Label label6;
     }
 }
 

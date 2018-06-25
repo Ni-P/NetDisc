@@ -16,7 +16,13 @@ namespace NetDisc
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainForm());
+            MainForm app = new MainForm();
+            Application.Run(app);
+
+            app.FormClosed += (object o, FormClosedEventArgs e) =>
+            {
+                Environment.Exit(0);
+            };
         }
     }
 }
