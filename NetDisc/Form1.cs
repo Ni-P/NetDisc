@@ -136,7 +136,7 @@ namespace NetDisc
                 {
                     this.Invoke(new Action(() =>
                         {
-                            this.ListBoxResults.Items.Add("Scanning complete");
+                            this.ListBoxResults.Items.Add("Scanning of subnet: " + textBoxTargetSubnet.Text + " has finished");
                             DoAutoscroll();
                             Unlockbuttons();
                         }));
@@ -242,7 +242,7 @@ namespace NetDisc
 
                             this.Invoke(new Action(() =>
                             {
-                                this.ListBoxResults.Items.Add("Reply from:  " + reply.Address + "    bytes=" + reply.Buffer.Length + "    RTT=" + reply.RoundtripTime);
+                                this.ListBoxResults.Items.Add("Reply <-  " + reply.Address + "    bytes=" + reply.Buffer.Length + "    RTT=" + reply.RoundtripTime);
                                 DoAutoscroll();
                             }));
                         }
@@ -254,7 +254,7 @@ namespace NetDisc
                     }
                     else
                     {
-                        this.ListBoxResults.Items.Add("Reply from:  " + reply.Address + "    bytes=" + reply.Buffer.Length + "    RTT=" + reply.RoundtripTime);
+                        this.ListBoxResults.Items.Add("Reply <-  " + reply.Address + "    bytes=" + reply.Buffer.Length + "    RTT=" + reply.RoundtripTime);
                         DoAutoscroll();
                     }
 
@@ -270,7 +270,7 @@ namespace NetDisc
 
                                 this.Invoke(new Action(() =>
                                 {
-                                    this.ListBoxResults.Items.Add("Ping to        " + ip + "    failed,    reason: " + reply.Status);
+                                    this.ListBoxResults.Items.Add("Ping to    " + ip + "    failed,    reason: " + reply.Status);
                                     DoAutoscroll();
                                 }));
                             }
@@ -284,7 +284,7 @@ namespace NetDisc
                     }
                     else
                     {
-                        Console.WriteLine("Ping to " + ip + " failed, reason: " + reply.Status);
+                        Console.WriteLine("Ping to    " + ip + "    failed,    reason: " + reply.Status);
 
                     }
                 }
@@ -296,7 +296,7 @@ namespace NetDisc
 
             if (this.ListBoxResults.Items.Count >= 24)
             {
-                this.ListBoxResults.TopIndex = this.ListBoxResults.Items.Count - 23;
+                this.ListBoxResults.TopIndex = this.ListBoxResults.Items.Count - 28;
             }
 
 
@@ -659,5 +659,6 @@ namespace NetDisc
                 }
             }
         }
+
     }
 }
