@@ -11,12 +11,14 @@ namespace NetDisc
 {
     class NetworkTools
     {
+        public bool isDebugEnabled { get; set; } = false;
+
         public NetworkTools()
         {
 
         }
 
-        public PingReply SendPing(object target, int timeout, PingOptions options, int bufferSize=32)
+        public PingReply SendPing(object target, int timeout, PingOptions options, int bufferSize = 32)
         {
             Ping ping = new Ping();
 
@@ -34,12 +36,13 @@ namespace NetDisc
                 PingReply reply = ping.Send(target.ToString(), timeout, buffer, options);
                 return reply;
 
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
                 return null;
             }
-            
+
         }
 
 
@@ -54,13 +57,16 @@ namespace NetDisc
                     if (adapter.OperationalStatus == OperationalStatus.Up)
                     {
                         properties = adapter.GetIPProperties();
-                        Console.WriteLine("Selected " + adapter.Name);
-                        Console.WriteLine("Description: " + adapter.Description);
-                        Console.WriteLine("IP4 " + ShowIPAddresses(adapter.NetworkInterfaceType));
+                        if (isDebugEnabled)
+                        {
+                            Console.WriteLine("Selected " + adapter.Name);
+                            Console.WriteLine("Description: " + adapter.Description);
+                            Console.WriteLine("IP4 " + ShowIPAddresses(adapter.NetworkInterfaceType));
+                        }
                         return adapter;
                     }
-                }
 
+                }
             }
             return null;
         }
@@ -97,12 +103,12 @@ namespace NetDisc
             return ip4arr.FirstOrDefault<IPAddress>();
         }
 
-        private IPAddress[] GetLocalIpStringArr(NetworkInterfaceType _type)
+        private IPAddress[] GetLocalIpStringArr(NetworkInterfaceType type)
         {
             List<IPAddress> ipAddrList = new List<IPAddress>();
             foreach (NetworkInterface item in NetworkInterface.GetAllNetworkInterfaces())
             {
-                if (item.NetworkInterfaceType == _type && item.OperationalStatus == OperationalStatus.Up)
+                if (item.NetworkInterfaceType == type && item.OperationalStatus == OperationalStatus.Up)
                 {
                     foreach (UnicastIPAddressInformation ip in item.GetIPProperties().UnicastAddresses)
                     {
@@ -115,12 +121,12 @@ namespace NetDisc
             }
             return ipAddrList.ToArray();
         }
-        private IPAddress[] GetLocalIpArray(NetworkInterfaceType _type)
+        private IPAddress[] GetLocalIpArray(NetworkInterfaceType type)
         {
             List<IPAddress> ipAddrList = new List<IPAddress>();
             foreach (NetworkInterface item in NetworkInterface.GetAllNetworkInterfaces())
             {
-                if (item.NetworkInterfaceType == _type && item.OperationalStatus == OperationalStatus.Up)
+                if (item.NetworkInterfaceType == type && item.OperationalStatus == OperationalStatus.Up)
                 {
                     foreach (UnicastIPAddressInformation ip in item.GetIPProperties().UnicastAddresses)
                     {
@@ -134,12 +140,12 @@ namespace NetDisc
             return ipAddrList.ToArray();
         }
 
-        private IPAddress[] GetAllLocalIPv6(NetworkInterfaceType _type)
+        private IPAddress[] GetAllLocalIPv6(NetworkInterfaceType type)
         {
             List<IPAddress> ipAddrList = new List<IPAddress>();
             foreach (NetworkInterface item in NetworkInterface.GetAllNetworkInterfaces())
             {
-                if (item.NetworkInterfaceType == _type && item.OperationalStatus == OperationalStatus.Up)
+                if (item.NetworkInterfaceType == type && item.OperationalStatus == OperationalStatus.Up)
                 {
                     foreach (UnicastIPAddressInformation ip in item.GetIPProperties().UnicastAddresses)
                     {
