@@ -45,6 +45,12 @@ namespace NetDisc
 
         }
 
+        public NetworkInterface[] GetAllInterfaces()
+        {
+            IPInterfaceProperties properties;
+            NetworkInterface[] interfaces = NetworkInterface.GetAllNetworkInterfaces();
+            return interfaces;
+        }
 
         public NetworkInterface GetInterface()
         {

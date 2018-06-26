@@ -558,6 +558,7 @@
             this.buttonDetectInterface.Text = "Detect Interface";
             this.buttonDetectInterface.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.buttonDetectInterface.UseVisualStyleBackColor = true;
+            this.buttonDetectInterface.Click += new System.EventHandler(this.buttonDetectInterface_Click);
             // 
             // buttonDisplayAll
             // 
@@ -568,9 +569,11 @@
             this.buttonDisplayAll.Text = "Display all Interfaces";
             this.buttonDisplayAll.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.buttonDisplayAll.UseVisualStyleBackColor = true;
+            this.buttonDisplayAll.Click += new System.EventHandler(this.buttonDisplayAll_Click);
             // 
             // buttonClearFailed
             // 
+            this.buttonClearFailed.Enabled = false;
             this.buttonClearFailed.Location = new System.Drawing.Point(3, 4);
             this.buttonClearFailed.Name = "buttonClearFailed";
             this.buttonClearFailed.Size = new System.Drawing.Size(134, 23);
@@ -578,6 +581,7 @@
             this.buttonClearFailed.Text = "Clear failed pings";
             this.buttonClearFailed.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.buttonClearFailed.UseVisualStyleBackColor = true;
+            this.buttonClearFailed.Click += new System.EventHandler(this.buttonClearFailed_Click);
             // 
             // buttonClearAll
             // 
@@ -588,6 +592,7 @@
             this.buttonClearAll.Text = "Clear all results";
             this.buttonClearAll.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.buttonClearAll.UseVisualStyleBackColor = true;
+            this.buttonClearAll.Click += new System.EventHandler(this.buttonClearAll_Click);
             // 
             // groupBoxSubnet
             // 

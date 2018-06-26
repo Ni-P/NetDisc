@@ -21,7 +21,8 @@ namespace NetDisc
         private int firstHost = 0;
         private int lastHost = 255;
         private int bufferSize = 32;
-        private bool _isPinging = false;
+        private volatile bool _isPinging = false;
+        private long scanId = 0;
 
         private int pendingPings = 0;
 
@@ -97,40 +98,79 @@ namespace NetDisc
 
         private void buttonSearch_Click(object sender, EventArgs e)
         {
+            if (_isPinging)
+            {
+                AbortScan(); // TODO: String new scan after aborting causes delay or failure
+                return;
+            }
 
-            this.buttonSearch.Text = "Sending pings...";
             Lockbuttons();
+            this.buttonSearch.Text = "Scanning...";
             //_PingInThread threadDelegate = PingTask;
             string subnetInput = this.textBoxTargetSubnet.Text;
+            // TODO: Error checking for inputs!
             string[] subnetBaseArr = subnetInput.Trim().Split('.');
             string subnetbase = subnetBaseArr[0] + "." + subnetBaseArr[1] + "." + subnetBaseArr[2];
             this.firstHost = (int)Convert.ToInt32(this.textBoxRangeMin.Text);
             this.lastHost = (int)Convert.ToInt32(this.textBoxRangeMax.Text);
             List<PingReply> replyList = new List<PingReply>();
             this.pendingPings = 0;
+            this._isPinging = true;
+            this.scanId = DateTime.Now.Ticks; // <- suspect
             for (int ip = this.firstHost; ip < this.lastHost; ip++)
             {
                 new Thread((targetip) =>
                 {
                     Thread.CurrentThread.IsBackground = false; // so the threads won't keep running when the form closes
                     this.pendingPings++;
-                    PingReply rep = PingTask(targetip.ToString());
-                    replyList.Add(rep);
-                    handlePingResults(rep, targetip.ToString());
-                    this.pendingPings--;
+                    long currentScanId = this.scanId;
+                    try
+                    {
+                        if (!_isPinging) Thread.CurrentThread.Abort();
+                        PingReply rep = PingTask(targetip.ToString());
+                        if (!_isPinging) Thread.CurrentThread.Abort();
+                        replyList.Add(rep);
+                        if (currentScanId == scanId)
+                            handlePingResults(rep, targetip.ToString());
+                    }
+                    catch (ThreadAbortException abort)
+                    {
+                        Console.WriteLine("Thread " + Thread.CurrentThread.Name + " was aborted");
+                    }
+                    finally
+                    {
+                        if (currentScanId == scanId)
+                            this.pendingPings--;
+
+                    }
                 }).Start(subnetbase + "." + ip);
                 //replyList.Add(PingTask(subnetbase+"."+ip));
 
             }
-            this.buttonSearch.Text = "Scan Subnet";
-            this.ListBoxResults.Items.Add("Pings sent");
-            Thread.Sleep(100);
+
+            this.buttonSearch.Text = "Abort Scan";
+            this.ListBoxResults.Items.Add("Scanning subnet:  " + this.textBoxTargetSubnet.Text);
+            Thread.Sleep(1);
+            Unlockbuttons();
             //Unlockbuttons();
             new Thread(() =>
             {
                 while (this.pendingPings > 0)
                 {
-                    Thread.Sleep(10);
+                    try
+                    {
+
+                        if (_isPinging)
+                            Thread.Sleep(10);
+                        else
+                        {
+                            Thread.CurrentThread.Abort();
+                        }
+                    }
+                    catch (ThreadAbortException abort)
+                    {
+                        Console.WriteLine("Thread counting thread was aborted.");
+                    }
                 }
                 if (InvokeRequired)
                 {
@@ -139,6 +179,8 @@ namespace NetDisc
                             this.ListBoxResults.Items.Add("Scanning of subnet: " + textBoxTargetSubnet.Text + " has finished");
                             DoAutoscroll();
                             Unlockbuttons();
+                            this.buttonSearch.Text = "Scan subnet";
+                            this._isPinging = false;
                         }));
                 }
             }).Start();
@@ -149,6 +191,34 @@ namespace NetDisc
 
             //}
             //this.ListBoxResults.Items.AddRange(replyList.ToArray());
+        }
+
+        private void AbortScan()
+        {
+            _isPinging = false;
+            this.pendingPings = 0;
+            this.buttonSearch.Text = "Aborting...";
+            Lockbuttons();
+            int sleepTimeoutCounter = 60000;
+            int sleepDelta = 50;
+            do
+            {
+                Thread.Sleep(sleepDelta);
+                sleepTimeoutCounter -= sleepDelta;
+                if (sleepTimeoutCounter <= 0)
+                {
+                    this.buttonSearch.Text = "Scan subnet";
+                    Unlockbuttons();
+                    break;
+                }
+            } while (this.pendingPings > 0);
+            this.buttonSearch.Text = "Scan subnet";
+            Unlockbuttons();
+            if (this.pendingPings > 0)
+            {
+                Console.WriteLine("Warning: Threads did not abort normally!");
+                this.pendingPings = 0;
+            }
         }
 
         private PingReply PingTask(string address)
@@ -660,5 +730,56 @@ namespace NetDisc
             }
         }
 
+        private void buttonClearAll_Click(object sender, EventArgs e)
+        {
+            this.ListBoxResults.Items.Clear();
+        }
+
+        private void buttonClearFailed_Click(object sender, EventArgs e)
+        {
+            lock (this.ListBoxResults)
+            {
+                try
+                {
+
+                }
+                catch (InvalidOperationException op)
+                {
+                    Console.WriteLine(op.Message);
+                }
+            }
+        }
+
+        private void buttonDetectInterface_Click(object sender, EventArgs e)
+        {
+            ReadHostInterface();
+        }
+
+        private void buttonDisplayAll_Click(object sender, EventArgs e)
+        {
+            // TODO: improve presentation of info
+            NetworkInterface[] ifArr = netTools.GetAllInterfaces();
+            foreach (NetworkInterface netif in ifArr)
+            {
+                //this.ListBoxResults.Items.Add(netif);
+                this.ListBoxResults.Items.Add(netif.Description);
+                this.ListBoxResults.Items.Add(netif.Name);
+                if (netTools.getIPv4Address(netif) != null)
+                    this.ListBoxResults.Items.Add(netTools.getIPv4Address(netif));
+                if (netTools.getIPv6Address(netif) != null)
+                    this.ListBoxResults.Items.Add(netTools.getIPv6Address(netif));
+                if (netTools.getMAC(netif) != null)
+                    this.ListBoxResults.Items.Add(netTools.getMAC(netif));
+                if (netif.GetIPProperties().GatewayAddresses.Count > 0)
+                    this.ListBoxResults.Items.Add(netif.GetIPProperties().GatewayAddresses.Select(g => g?.Address).Where(a => a != null).FirstOrDefault());
+                if (netif.GetIPProperties().UnicastAddresses.Count > 0)
+                {
+                    this.ListBoxResults.Items.Add(netif.GetIPProperties().UnicastAddresses.Select(g => g?.IPv4Mask).Where(a => a != null).FirstOrDefault());
+                    this.ListBoxResults.Items.Add(netif.GetIPProperties().UnicastAddresses.Select(g => g?.Address).Where(a => a != null).FirstOrDefault());
+
+                }
+                this.ListBoxResults.Items.Add("----------------------------------------------------------------------------------------------------");
+            }
+        }
     }
 }
